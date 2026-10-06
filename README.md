@@ -1,25 +1,68 @@
-# Git Agent Android AI Assistant
+# AURIX Android (Phase 1 Foundation)
 
-A small native Android chat assistant built with Kotlin and Jetpack Compose. It runs safely in demo mode without credentials and supports OpenAI-compatible chat completion APIs.
+AURIX is an Android AI assistant app built with Kotlin + Jetpack Compose + Material 3 in package `com.levinhocall.gitagent`.
 
-## Run
+## Implemented in this phase
 
-1. Open the repository in Android Studio Hedgehog or newer.
-2. Copy `local.properties.example` values into your local configuration as needed. Never commit API keys.
-3. Sync Gradle and run the `app` configuration on an Android 8.0+ device or emulator.
+- Provider-agnostic AI domain layer:
+  - `AiProvider`, `AiModel`, `AiMessage`, `AiResult`, `ProviderError`, `TokenUsage`
+- Provider abstraction and selection flow:
+  - OpenRouter provider (real HTTP)
+  - Gemini provider (real HTTP)
+  - Model switching per provider
+  - Provider health/config state
+- Error handling:
+  - auth, rate-limit, timeout, network, cancellation, service, unknown mapping
+- Security:
+  - Android Keystore-backed key storage via `EncryptedSharedPreferences` + `MasterKey`
+  - No API keys in source, BuildConfig, or repository files
+- Persistence:
+  - lightweight local conversation history in shared preferences
+  - simple relevance retrieval from prior messages
+- UI (Compose, dark futuristic Phase 1):
+  - chat history
+  - loading/thinking state
+  - animated AI core/orb
+  - provider/model selectors
+  - settings input for provider API key
+  - microphone affordance placeholder (explicitly not implemented)
+  - tool/status placeholders (explicitly not implemented)
+- Tool registry foundation:
+  - tool metadata, permission requirements, risk, approval state
+  - safe `app.status` implementation + unsupported placeholder tools
+- Unit tests:
+  - provider error mapping
+  - OpenRouter provider HTTP behavior using `MockWebServer`
+  - credential storage behavior (`InMemoryCredentialStore`)
+  - ViewModel state transitions
 
-Without a key, the app uses demo mode. For a live provider, add these values to `app/build.gradle.kts` through your preferred local-only Gradle mechanism, or replace the generated `BuildConfig` fields in a private build flavor:
+## Not yet implemented (roadmap)
 
-- `ASSISTANT_API_KEY`
-- `ASSISTANT_BASE_URL` (default pattern: `https://api.openai.com/v1`)
-- `ASSISTANT_MODEL`
+- Streaming token-by-token UI rendering
+- Real web search/tool execution
+- Android device action tools
+- Mission engine orchestration
+- STT/TTS lifecycle integration
+- Advanced long-term memory indexing
 
-The app intentionally does not include a real key. For production, put provider calls behind your own authenticated backend rather than shipping a provider secret in an APK.
+## Setup
 
-## Features
+1. Open in Android Studio (or use local Gradle).
+2. Add API keys at runtime from the app settings area (keys are stored in Android Keystore-backed encrypted storage).
+3. Select provider + model and start chatting.
 
-- Compose chat UI with loading, error, clear, and demo states.
-- OpenAI-compatible JSON request/response handling.
-- Background networking with timeouts.
-- Conversation state held in a ViewModel across configuration changes.
-- Accessible labels and responsive layout.
+### Provider notes
+
+- **OpenRouter** endpoint default: `https://openrouter.ai/api/v1`
+- **Gemini** endpoint default: `https://generativelanguage.googleapis.com/v1beta`
+
+If a key is missing, the app shows a configuration error state. It does not fake success responses.
+
+## Build and test
+
+```bash
+gradle :app:testDebugUnitTest
+gradle :app:assembleDebug
+```
+
+If your environment lacks Android plugin resolution/network access, run these commands in Android Studio with a configured Android SDK.
