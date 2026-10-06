@@ -1,3 +1,5 @@
-# Local-only Gradle configuration
-# Add these fields to app/build.gradle.kts in a private checkout if using a live API:
-# android { defaultConfig { buildConfigField("String", "ASSISTANT_API_KEY", "\"...\"") } }
+# Local configuration
+
+AURIX now stores provider API keys at runtime using Android Keystore-backed encrypted preferences.
+
+Do not commit API keys to Git, source files, BuildConfig fields, or local.properties.
